@@ -4,9 +4,9 @@ using System.IO;
 
 public class GridScript : MonoBehaviour {
 
-    private List<List<GameObject>> blockGrid_;
-    private List<List<Block.States>> gridStates_;
-    private Camera camera_;
+    private List<List<GameObject>> blockGrid;
+    private List<List<Block.States>> statesGrid;
+    private Camera camera;
 
     private AStarPathfinder AStar;
 
@@ -15,23 +15,23 @@ public class GridScript : MonoBehaviour {
     private const int GRID_WIDTH = 20;
     private const int GRID_HEIGHT = 20;
 
-    // Use this for initialization
     void Start () {
-        blockGrid_ = new List<List<GameObject>>();
-        gridStates_ = new List<List<Block.States>>();
+        blockGrid = new List<List<GameObject>>();
+        statesGrid = new List<List<Block.States>>();
 
         AStar = new AStarPathfinder();
         foundPath = new List<List<Block.States>>();
 
-        camera_ = Camera.main;
+        camera = Camera.main;
 
         parseMaze();
         setCamera();
-        AStar.initializeMaze(gridStates_);
+        AStar.initializeMaze(statesGrid);
         foundPath = AStar.algorithm();
         updateMaze(foundPath);
     }
 
+    // Set camera in the center and pointing towards the grid.
     private void setCamera()
     {
         int armLength = 0;
@@ -43,16 +43,16 @@ public class GridScript : MonoBehaviour {
         {
             armLength = GRID_WIDTH;
         }
-        camera_.transform.position = 
-            new Vector3(blockGrid_[GRID_HEIGHT/2][GRID_WIDTH/2].transform.position.x,
-                        blockGrid_[GRID_HEIGHT / 2][GRID_WIDTH / 2].transform.position.y,
+        camera.transform.position = 
+            new Vector3(blockGrid[GRID_HEIGHT/2][GRID_WIDTH/2].transform.position.x,
+                        blockGrid[GRID_HEIGHT / 2][GRID_WIDTH / 2].transform.position.y,
                         -armLength);
     }
 
-    // Parses txt file and creates gridStates_
+    // Parses txt file and creates blockGrid and statesGrid
     private void parseMaze()
     {
-        string path = "Assets/Resources/maze20x20.txt";
+        string path = "Assets/Resources/TextFiles/maze20x20.txt";
         StreamReader reader = new StreamReader(path);
 
         for (int i = 0; i < GRID_WIDTH; i++)
@@ -79,13 +79,13 @@ public class GridScript : MonoBehaviour {
                         currentState = Block.States.END;
                         break;
                 }
-                GameObject go = Instantiate(Resources.Load("BlockPrefab", typeof(GameObject))) as GameObject;
+                GameObject go = Instantiate(Resources.Load("Prefabs/BlockPrefab", typeof(GameObject))) as GameObject;
                 go.GetComponent<Transform>().position = new Vector3(j, -i, 0);
                 goRow.Add(go);
                 stateRow.Add(currentState);
             }
-            gridStates_.Add(stateRow);
-            blockGrid_.Add(goRow);
+            statesGrid.Add(stateRow);
+            blockGrid.Add(goRow);
         }
     }
 
@@ -95,8 +95,8 @@ public class GridScript : MonoBehaviour {
         {
             for (int j = 0; j < GRID_HEIGHT; j++)
             {
-                blockGrid_[i][j].GetComponent<Block>().switchState(newMaze[i][j]);
-                blockGrid_[i][j].GetComponent<Block>().checkState();
+                blockGrid[i][j].GetComponent<Block>().switchState(newMaze[i][j]);
+                blockGrid[i][j].GetComponent<Block>().checkState();
             }
         }
     }

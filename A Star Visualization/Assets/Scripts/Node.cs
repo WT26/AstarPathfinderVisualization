@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+
 
 namespace Assets
 {
@@ -12,6 +10,7 @@ namespace Assets
         public float gScore;
         public float fScore;
         public float hScore;
+        public float movementCost;
         public Block.States state;
 
         public List<Node> neighbours;
@@ -27,6 +26,7 @@ namespace Assets
             gScore = 0.0f;
             fScore = 0.0f;
             hScore = 0.0f;
+            movementCost = 1.0f;
             state = Block.States.NOT_VISITED;
 
             neighbours = new List<Node>();
@@ -53,16 +53,16 @@ namespace Assets
             // DIAGONAL
 
             // Top Left
-            if ((i > 0) && (j > 0)) { neighbours.Add(nodeGrid[i - 1][j - 1]); }
+            if ((i > 0) && (j > 0)) { neighbours.Add(nodeGrid[i - 1][j - 1]); movementCost = 1.414f; }
 
             // Top Right
-            if ((i < cols - 1) && (j > 0)) { neighbours.Add(nodeGrid[i + 1][j - 1]); }
+            if ((i < cols - 1) && (j > 0)) { neighbours.Add(nodeGrid[i + 1][j - 1]); movementCost = 1.414f; }
 
             // Bottom Left
-            if ((i > 0) && (j < rows - 1)) { neighbours.Add(nodeGrid[i - 1][j + 1]); }
+            if ((i > 0) && (j < rows - 1)) { neighbours.Add(nodeGrid[i - 1][j + 1]); movementCost = 1.414f; }
 
             // Bottom Right
-            if ((i < cols - 1) && (j < rows - 1)) { neighbours.Add(nodeGrid[i + 1][j + 1]); }
+            if ((i < cols - 1) && (j < rows - 1)) { neighbours.Add(nodeGrid[i + 1][j + 1]); movementCost = 1.414f; }
         }
     }
 }

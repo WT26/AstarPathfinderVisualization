@@ -7,9 +7,10 @@ public class AStarPathfinder : MonoBehaviour {
     private List<List<Node>> nodeGrid;
     private List<List<Block.States>> statesGrid;
 
-    private List<Node> closedSet;
     private List<Node> openSet;
     private List<Node> path;
+
+    private HashSet<Node> closedSet;
 
     private Node endNode;
 
@@ -22,7 +23,8 @@ public class AStarPathfinder : MonoBehaviour {
         statesGrid = new List<List<Block.States>>();
 
         openSet = new List<Node>();
-        closedSet = new List<Node>();
+        closedSet = new HashSet<Node>();
+
         endNode = new Node(columnCount, rowCount);
 
         path = new List<Node>();
@@ -125,6 +127,9 @@ public class AStarPathfinder : MonoBehaviour {
         float d = euclideanDist(currentNode.i, currentNode.j, endNode.i, endNode.j);
         //float d = chebyshev(currentNode.i, currentNode.j, endNode.i, endNode.j);
         //float d = euclideanDistWithSqrt(currentNode.i, currentNode.j, endNode.i, endNode.j);
+
+        d *= currentNode.movementCost;
+
         return d;
     }
 
