@@ -6,6 +6,7 @@ public class GridScript : MonoBehaviour {
 
     private List<List<GameObject>> blockGrid;
     private List<List<Block.States>> statesGrid;
+    private List<List<Block.States>> initialGrid;
     private Camera camera;
 
     private AStarPathfinder AStar;
@@ -14,6 +15,9 @@ public class GridScript : MonoBehaviour {
 
     private const int GRID_WIDTH = 20;
     private const int GRID_HEIGHT = 20;
+
+    private int goal_i;
+    private int goal_j;
 
     void Start () {
         blockGrid = new List<List<GameObject>>();
@@ -29,6 +33,80 @@ public class GridScript : MonoBehaviour {
         AStar.initializeMaze(statesGrid);
         foundPath = AStar.algorithm();
         updateMaze(foundPath);
+    }
+
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit))
+            {
+
+                statesGrid = initialGrid;
+                int tempi = hit.transform.GetComponent<Block>().getCoordI();
+                int tempj = hit.transform.GetComponent<Block>().getCoordJ();
+                if (!((tempi == goal_i) && (tempj == goal_j)))
+                {
+                    updateBlock(tempi, tempj, Block.States.END);
+                    statesGrid[tempi][tempj] = Block.States.END;
+
+                    updateBlock(goal_i, goal_j, Block.States.NOT_VISITED);
+                    statesGrid[goal_i][goal_j] = Block.States.NOT_VISITED;
+
+                    goal_i = tempi;
+                    goal_j = tempj;
+
+
+                    updateMaze(statesGrid);
+
+                    AStar.initializeMaze(statesGrid);
+                    foundPath = AStar.algorithm();
+                    updateMaze(foundPath);
+                }
+            }
+        }
+        if (Input.GetMouseButtonDown(1))
+        { 
+            Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit))
+            {
+
+                statesGrid = initialGrid;
+                int tempi = hit.transform.GetComponent<Block>().getCoordI();
+                int tempj = hit.transform.GetComponent<Block>().getCoordJ();
+
+                if (statesGrid[tempi][tempj] == Block.States.WALL)
+                {
+                    updateBlock(tempi, tempj, Block.States.NOT_VISITED);
+                    statesGrid[tempi][tempj] = Block.States.NOT_VISITED;
+                }
+                else if ((statesGrid[tempi][tempj] == Block.States.START) || (statesGrid[tempi][tempj] == Block.States.END))
+                {
+                    //
+                }
+                else
+                {
+                    updateBlock(tempi, tempj, Block.States.WALL);
+                    statesGrid[tempi][tempj] = Block.States.WALL;
+                }
+
+                updateMaze(statesGrid);
+
+                AStar.initializeMaze(statesGrid);
+                foundPath = AStar.algorithm();
+                if (foundPath.Count == 0)
+                {
+                    Debug.Log("Cannot reach goal.");
+                }
+                else
+                {
+                    updateMaze(foundPath);
+                }
+            }
+        }
     }
 
     // Set camera in the center and pointing towards the grid.
@@ -77,9 +155,12 @@ public class GridScript : MonoBehaviour {
                         break;
                     case 'E':
                         currentState = Block.States.END;
+                        goal_i = i;
+                        goal_j = j;
                         break;
                 }
                 GameObject go = Instantiate(Resources.Load("Prefabs/BlockPrefab", typeof(GameObject))) as GameObject;
+                go.GetComponent<Block>().setCoordinates(i, j);
                 go.GetComponent<Transform>().position = new Vector3(j, -i, 0);
                 goRow.Add(go);
                 stateRow.Add(currentState);
@@ -87,6 +168,7 @@ public class GridScript : MonoBehaviour {
             statesGrid.Add(stateRow);
             blockGrid.Add(goRow);
         }
+        initialGrid = statesGrid;
     }
 
     private void updateMaze(List<List<Block.States>> newMaze)
@@ -99,5 +181,11 @@ public class GridScript : MonoBehaviour {
                 blockGrid[i][j].GetComponent<Block>().checkState();
             }
         }
+    }
+
+    public void updateBlock(int i, int j, Block.States state)
+    {
+        blockGrid[i][j].GetComponent<Block>().switchState(state);
+        blockGrid[i][j].GetComponent<Block>().checkState();
     }
 }

@@ -6,12 +6,15 @@ public class Block : MonoBehaviour {
     public States currentState;
     private Renderer rend;
 
+    int i;
+    int j;
+
     // Use this for initialization
     void Start () {
         currentState = States.NOT_VISITED;
     }
 
-
+   
     public void switchState(States newState)
     {
         currentState = newState;
@@ -38,13 +41,35 @@ public class Block : MonoBehaviour {
                 break;
             case States.WALL:
                 rend.material.color = Color.black;
+                t.localScale = new Vector3(1f,1f, 1f);
+
                 break;
             case States.START:
                 rend.material.color = Color.green;
+                t.localScale = new Vector3(1f, 1f, 1f);
+
                 break;
             case States.END:
                 rend.material.color = Color.red;
+                t.localScale = new Vector3(1f, 1f, 1f);
+
                 break;
         }
+    }
+
+    public void setCoordinates(int i, int j)
+    {
+        this.i = i;
+        this.j = j;
+    }
+
+    public int getCoordI()
+    {
+        return i;
+    }
+
+    public int getCoordJ()
+    {
+        return j;
     }
 }
